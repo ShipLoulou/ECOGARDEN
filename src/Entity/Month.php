@@ -6,21 +6,25 @@ use App\Repository\MonthRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MonthRepository::class)]
 class Month
 {
     #[ORM\Id]
     #[ORM\Column]
+    #[Groups(["getAdvice"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["getAdvice"])]
     private ?string $libelle = null;
 
     /**
      * @var Collection<int, Advice>
      */
     #[ORM\ManyToMany(targetEntity: Advice::class, mappedBy: 'month')]
+    #[Groups(["getAdvice"])]
     private Collection $advice;
 
     public function __construct()

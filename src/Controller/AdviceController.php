@@ -2,18 +2,25 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Entity\Month;
+use App\Repository\MonthRepository;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Serializer\SerializerInterface;
 
 final class AdviceController extends AbstractController
 {
-    #[Route('/advice', name: 'app_advice')]
-    public function index(): JsonResponse
+    public function __construct(
+        private MonthRepository $monthRepository,
+        private SerializerInterface $serializer
+    ) {}
+
+    #[Route('/api/conseil/{id}', name: 'api_advice_month', methods: ['GET'])]
+    public function getPerMonth(Month $month): JsonResponse
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/AdviceController.php',
-        ]);
+        $jsonMonth = $this->serializer->serialize($month, 'json', ['groups' => 'getAdvice']);
+        return new JsonResponse($jsonMonth, Response::HTTP_OK, [], true);
     }
 }
