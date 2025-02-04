@@ -13,18 +13,18 @@ class Month
 {
     #[ORM\Id]
     #[ORM\Column]
-    #[Groups(["getAdvice"])]
+    #[Groups(["getAdvicesOfTheMonth", "getMonthsOfAdvice"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getAdvice"])]
+    #[Groups(["getAdvicesOfTheMonth", "getMonthsOfAdvice"])]
     private ?string $libelle = null;
 
     /**
      * @var Collection<int, Advice>
      */
     #[ORM\ManyToMany(targetEntity: Advice::class, mappedBy: 'month')]
-    #[Groups(["getAdvice"])]
+    #[Groups(["getAdvicesOfTheMonth"])]
     private Collection $advice;
 
     public function __construct()

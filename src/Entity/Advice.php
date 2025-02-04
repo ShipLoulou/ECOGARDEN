@@ -8,6 +8,7 @@ use App\Repository\AdviceRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AdviceRepository::class)]
 class Advice
@@ -15,17 +16,20 @@ class Advice
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getAdvice"])]
+    #[Groups(["getAdvicesOfTheMonth", "getMonthsOfAdvice"])]
     private ?int $id = null;
 
     /**
      * @var Collection<int, Month>
      */
     #[ORM\ManyToMany(targetEntity: Month::class, inversedBy: 'advice')]
+    #[Groups(["getMonthsOfAdvice"])]
+    #[Assert\NotBlank(message: "Le champs month est obligatoire.")]
     private Collection $month;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["getAdvice"])]
+    #[Groups(["getAdvicesOfTheMonth", "getMonthsOfAdvice"])]
+    #[Assert\NotBlank(message: "Le champs content est obligatoire.")]
     private ?string $content = null;
 
     public function __construct()
