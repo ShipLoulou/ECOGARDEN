@@ -19,7 +19,7 @@ migration-migrate: ## Création de la migration
 		$(SYMFONY_CONSOLE) doctrine:migrations:migrate --no-interaction
 
 fixtures: ## Création des fixtures
-		$(SYMFONY_CONSOLE) doctrine:fixtures:load
+		$(SYMFONY_CONSOLE) doctrine:fixtures:load --no-interaction
 
 ## —— 🛠️ Others ——
 help: ## List of commands
