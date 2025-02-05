@@ -17,10 +17,8 @@ class CallApiOpenWeatherService
 
     public function getOpenWeatherApi($cityName): ?array
     {
-        return $this->cache->get('api_data', function (ItemInterface $item, $cityName) {
-            // Définir la durée de vie du cache (ex: 1 heure)
-            $item->expiresAfter(3600);
-
+        return $this->cache->get('api_data_' . md5($cityName), function (ItemInterface $item) use ($cityName) {
+            $item->expiresAfter(3600); // Cache d'une heure
             $arrayData = $this->getGeocodingApi($cityName);
 
             if ($arrayData !== []) {
