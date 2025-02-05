@@ -71,4 +71,13 @@ final class UserController extends AbstractController
             'message' => "Le compte {$updatedUser->getEmail()} a bien été modifier."
         ], JsonResponse::HTTP_OK);
     }
+
+    #[Route('/api/user/{id}', name: 'api_user_delete', methods: ['DELETE'])]
+    public function delete(
+        User $user
+    ): JsonResponse {
+        $this->em->remove($user);
+        $this->em->flush();
+        return new JsonResponse(null, JsonResponse::HTTP_OK);
+    }
 }
