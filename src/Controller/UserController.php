@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -46,5 +47,28 @@ final class UserController extends AbstractController
         return new JsonResponse([
             'message' => "L'utilisateur {$user->getEmail()} a été créé avec succès."
         ], Response::HTTP_CREATED);
+    }
+
+    #[Route('/api/user/{id}', name: 'api_user_update', methods: ['PUT'])]
+    public function update(
+        Request $request,
+        User $currentUser
+    ): JsonResponse {
+        $updatedUser = $this->serializer->deserialize(
+            $request->getContent(),
+            User::class,
+            'json',
+            [AbstractNormalizer::OBJECT_TO_POPULATE => $currentUser]
+        );
+
+        $password = $updatedUser->getPassword();
+        $updatedUser->setPassword($this->userPasswordHasher->hashPassword($updatedUser, $password));
+
+        $this->em->persist($updatedUser);
+        $this->em->flush();
+
+        return new JsonResponse([
+            'message' => "Le compte {$updatedUser->getEmail()} a bien été modifier."
+        ], JsonResponse::HTTP_OK);
     }
 }
