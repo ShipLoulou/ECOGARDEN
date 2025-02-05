@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Validator\Constraints\Json;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use function Symfony\Component\Clock\now;
@@ -71,5 +73,54 @@ final class AdviceController extends AbstractController
         $jsonAdvice = $this->serializer->serialize($advice, 'json', ['groups' => 'getMonthsOfAdvice']);
 
         return new JsonResponse($jsonAdvice, Response::HTTP_CREATED, [], true);
+    }
+
+    #[Route('/api/conseil/{id}', name: 'api_advice_update', methods: ['PUT'])]
+    public function update(
+        Request $request,
+        Advice $currentAdvice
+    ): JsonResponse {
+        $updatedAdvice = $this->serializer->deserialize(
+            $request->getContent(),
+            Advice::class,
+            'json',
+            [
+                AbstractNormalizer::OBJECT_TO_POPULATE => $currentAdvice,
+                'ignored_attributes' => ['month']
+            ]
+        );
+
+        $content = $request->toArray();
+
+        $idMonth = $content['month'] ?? null;
+
+        if (is_array($idMonth)) {
+            // Récupérer les mois actuels.
+            $currentMonths = $updatedAdvice->getMonth()->toArray();
+
+            // Transformer en tableau d'id.
+            $currentMonthIds = array_map(fn($month) => $month->getId(), $currentMonths);
+
+            // Supprimer les mois qui ne sont plus dans la nouvelle liste.
+            foreach ($currentMonths as $month) {
+                if (!in_array($month->getId(), $idMonth)) {
+                    $updatedAdvice->removeMonth($month);
+                }
+            }
+
+            // Ajouter les nouveaux mois qui ne sont pas déjà présents.
+            foreach ($idMonth as $value) {
+                if (!in_array($value, $currentMonthIds)) {
+                    $updatedAdvice->addMonth($this->monthRepository->find($value));
+                }
+            }
+        }
+
+        $this->em->persist($updatedAdvice);
+        $this->em->flush();
+
+        return new JsonResponse([
+            'message' => "Le conseil avec l'id {$updatedAdvice->getId()} a bien été modifier."
+        ], JsonResponse::HTTP_OK);
     }
 }
