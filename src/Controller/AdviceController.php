@@ -123,4 +123,13 @@ final class AdviceController extends AbstractController
             'message' => "Le conseil avec l'id {$updatedAdvice->getId()} a bien été modifier."
         ], JsonResponse::HTTP_OK);
     }
+
+    #[Route('/api/conseil/{id}', name: 'api_advice_delete', methods: ['DELETE'])]
+    public function delete(
+        Advice $advice
+    ): JsonResponse {
+        $this->em->remove($advice);
+        $this->em->flush();
+        return new JsonResponse(null, JsonResponse::HTTP_OK);
+    }
 }
