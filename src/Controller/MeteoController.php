@@ -35,4 +35,18 @@ final class MeteoController extends AbstractController
             'message' => "Information sur la ville introuvable."
         ], Response::HTTP_BAD_REQUEST);
     }
+
+    #[Route('/api/meteo/{ville}', name: 'api_meteo_city', methods: ['GET'])]
+    public function getWeather($ville): JsonResponse
+    {
+        $weatherData = $this->callApiOpenWeatherService->getOpenWeatherApi($ville);
+
+        if (is_array($weatherData)) {
+            return new JsonResponse($weatherData, JsonResponse::HTTP_OK);
+        }
+
+        return new JsonResponse([
+            'message' => "Information sur la ville introuvable."
+        ], Response::HTTP_BAD_REQUEST);
+    }
 }
