@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class UserController extends AbstractController
 {
@@ -50,6 +51,7 @@ final class UserController extends AbstractController
     }
 
     #[Route('/api/user/{id}', name: 'api_user_update', methods: ['PUT'])]
+    #[IsGranted('ROLE_ADMIN', message: "Vous n'avez pas les autorisations nécessaires.", statusCode: 403)]
     public function update(
         Request $request,
         User $currentUser
@@ -73,6 +75,7 @@ final class UserController extends AbstractController
     }
 
     #[Route('/api/user/{id}', name: 'api_user_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN', message: "Vous n'avez pas les autorisations nécessaires.", statusCode: 403)]
     public function delete(
         User $user
     ): JsonResponse {

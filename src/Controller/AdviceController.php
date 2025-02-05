@@ -2,21 +2,22 @@
 
 namespace App\Controller;
 
-use App\Entity\Advice;
 use App\Entity\Month;
+use App\Entity\Advice;
 use App\Repository\MonthRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use function Symfony\Component\Clock\now;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Constraints\Json;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Validator\Constraints\Json;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-use function Symfony\Component\Clock\now;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class AdviceController extends AbstractController
 {
@@ -47,6 +48,7 @@ final class AdviceController extends AbstractController
     }
 
     #[Route('/api/conseil', name: 'api_advice_create', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN', message: "Vous n'avez pas les autorisations nécessaires.", statusCode: 403)]
     public function create(
         Request $request
     ): JsonResponse {
@@ -76,6 +78,7 @@ final class AdviceController extends AbstractController
     }
 
     #[Route('/api/conseil/{id}', name: 'api_advice_update', methods: ['PUT'])]
+    #[IsGranted('ROLE_ADMIN', message: "Vous n'avez pas les autorisations nécessaires.", statusCode: 403)]
     public function update(
         Request $request,
         Advice $currentAdvice
@@ -125,6 +128,7 @@ final class AdviceController extends AbstractController
     }
 
     #[Route('/api/conseil/{id}', name: 'api_advice_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN', message: "Vous n'avez pas les autorisations nécessaires.", statusCode: 403)]
     public function delete(
         Advice $advice
     ): JsonResponse {
