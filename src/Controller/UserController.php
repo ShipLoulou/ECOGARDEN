@@ -66,6 +66,8 @@ final class UserController extends AbstractController
         $password = $updatedUser->getPassword();
         $updatedUser->setPassword($this->userPasswordHasher->hashPassword($updatedUser, $password));
 
+        $updatedUser->setCity($this->callApiCartoService->getCity($updatedUser->getPostalCode()));
+
         $this->em->persist($updatedUser);
         $this->em->flush();
 

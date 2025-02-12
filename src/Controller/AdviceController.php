@@ -6,11 +6,12 @@ use App\Entity\Month;
 use App\Entity\Advice;
 use App\Repository\MonthRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Id;
+
 use function Symfony\Component\Clock\now;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Validator\Constraints\Json;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -28,17 +29,16 @@ final class AdviceController extends AbstractController
         private ValidatorInterface $validator
     ) {}
 
-    #[Route('/api/conseil/{id}', name: 'api_advice_month', methods: ['GET'])]
-    public function getAdvicePerMonth(
-        Month $month
+    #[Route('/api/conseil/{id}', name: 'api_advice', methods: ['GET'], defaults: ['id' => null])]
+    public function getAdviceCurrentMonth(
+        Month $month = null
     ): JsonResponse {
-        $jsonMonth = $this->serializer->serialize($month, 'json', ['groups' => 'getAdvicesOfTheMonth']);
-        return new JsonResponse($jsonMonth, Response::HTTP_OK, [], true);
-    }
 
-    #[Route('/api/conseil', name: 'api_advice', methods: ['GET'])]
-    public function getAdviceCurrentMonth(): JsonResponse
-    {
+        if ($month) {
+            $jsonMonth = $this->serializer->serialize($month, 'json', ['groups' => 'getAdvicesOfTheMonth']);
+            return new JsonResponse($jsonMonth, Response::HTTP_OK, [], true);
+        }
+
         $currentMonth = intval(now()->format('n'));
 
         $month = $this->monthRepository->find($currentMonth);

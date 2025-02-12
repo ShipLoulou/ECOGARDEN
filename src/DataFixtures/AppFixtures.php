@@ -20,6 +20,7 @@ class AppFixtures extends Fixture
         $user->setEmail('user@gmail.com')
             ->setPassword($this->userPasswordHasher->hashPassword($user, "password"))
             ->setPostalCode(44000)
+            ->setCity("Nantes")
         ;
 
         $manager->persist($user);
